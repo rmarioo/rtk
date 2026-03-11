@@ -80,6 +80,26 @@ curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/instal
 cargo install --git https://github.com/rtk-ai/rtk
 ```
 
+### Build from Source (local development)
+
+If you have cloned the repository and want to build and use `rtk` locally:
+
+```bash
+# Quick test build (debug binary)
+cargo build
+./target/debug/rtk --version
+
+# Install to ~/.cargo/bin so `rtk` is available everywhere
+cargo install --path .
+rtk --version   # should show current version
+```
+
+> Make sure `~/.cargo/bin` is in your PATH. If not, add this to your `~/.zshrc` / `~/.bashrc`:
+> ```bash
+> export PATH="$HOME/.cargo/bin:$PATH"
+> ```
+> Then run `source ~/.zshrc` (or open a new terminal).
+
 ### Pre-built Binaries
 
 Download from [releases](https://github.com/rtk-ai/rtk/releases):
@@ -191,6 +211,29 @@ rtk ruff check                  # Python linting (JSON, -80%)
 rtk golangci-lint run           # Go linting (JSON, -85%)
 rtk rubocop                     # Ruby linting (JSON, -60%+)
 ```
+
+### Maven (Java)
+```bash
+rtk mvn test                    # Test failures + summary only (-80%)
+rtk mvn verify                  # Same filtering for verify goal
+rtk mvn package                 # Warnings + errors + BUILD result (-80%)
+rtk mvn clean install           # Full build, stripped of download noise
+rtk mvn install -DskipTests     # Skip tests, errors/warnings only
+rtk mvn -pl module-a test       # Multi-module: test a specific module
+```
+
+**What gets filtered out:**
+- Download/upload progress (`Downloading from central:`, `Progress (N):`)
+- Plugin separator banners (`[INFO] ---`)
+- Empty `[INFO]` lines and verbose build phase messages
+- Passing per-class test summaries (only failures shown in test mode)
+
+**What is always preserved:**
+- `BUILD SUCCESS` / `BUILD FAILURE`
+- Test failures and errors with truncated stack traces
+- Warnings (`[WARNING]`) in build mode
+- Global test summary (`Tests run: X, Failures: Y, Errors: Z`)
+- Reactor summary for multi-module builds
 
 ### Package Managers
 ```bash
@@ -423,6 +466,7 @@ Blocked on upstream BeforeToolCallback support ([mistral-vibe#531](https://githu
 | `kubectl get/logs` | `rtk kubectl ...` |
 | `curl` | `rtk curl` |
 | `pnpm list/outdated` | `rtk pnpm ...` |
+| `mvn test/package/install/...` | `rtk mvn ...` |
 
 Commands already using `rtk`, heredocs (`<<`), and unrecognized commands pass through unchanged.
 
